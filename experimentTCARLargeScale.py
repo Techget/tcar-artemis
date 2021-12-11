@@ -12,7 +12,6 @@ from open_spiel.python.egt import alpharank
 from open_spiel.python.egt import alpharank_visualizer
 from open_spiel.python.egt import utils
 import pyspiel
-# import pyten
 from pyten.method import * 
 import numpy as np
 from pyten.tools import tenerror
@@ -54,7 +53,7 @@ def main(unused_arg):
   # Report & plot results
   utils.print_rankings_table(payoff_tables, pi, strat_labels_original, num_top_strats_to_print=10)
 
-  for data_keep_rate in np.arange(0.7,0.99,0.1):
+  for data_keep_rate in np.arange(0.3,0.99,0.01):
     ####### setup tensor completion ##########
     payoff_shape = payoff_tables[0].shape
     omegas = []
@@ -105,6 +104,7 @@ def main(unused_arg):
     # print('p_value', p_value)
 
     writer.writerow([data_keep_rate, np.max(np.abs(pi_est - pi)), np.sqrt(np.mean((pi_est-pi)**2)), tau])
+    print([data_keep_rate, np.max(np.abs(pi_est - pi)), np.sqrt(np.mean((pi_est-pi)**2)), tau])
 
 
 if __name__ == '__main__':
