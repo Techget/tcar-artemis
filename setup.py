@@ -26,7 +26,7 @@ def deps_install():
 
 class pyten_install(install):
     def run(self):
-        deps_install()
+        # deps_install()
         import numpy as np
         include_dirs.append(np.get_include())
         install.run(self)

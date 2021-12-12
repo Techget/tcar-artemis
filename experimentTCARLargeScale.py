@@ -11,11 +11,11 @@ from open_spiel.python.algorithms import fictitious_play
 from open_spiel.python.egt import alpharank
 from open_spiel.python.egt import alpharank_visualizer
 from open_spiel.python.egt import utils
-import pyspiel
-from pyten.method import * 
+import pyspiel 
 import numpy as np
 from pyten.tools import tenerror
 from pyten.tenclass import tensor
+from pyten.method import *
 import scipy.stats as stats
 import tensorly as tl
 from tensorly.decomposition import tucker,CP, parafac
