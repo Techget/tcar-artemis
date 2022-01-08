@@ -41,6 +41,10 @@ def main(unused_arg):
   # Construct meta-game payoff tables
   num_players = 4
   payoff_tables = get_game_fictitious_play_payoff_data('kuhn_poker', num_players, {'players': num_players})
+
+  with open('payoff_open_spiel_kuhn_poker_seed27_data.npy', 'wb') as f:
+    np.save(f, np.array(payoff_tables))
+
   f = open('synthetic_experiment_result.csv', 'w')
   writer = csv.writer(f)
 
