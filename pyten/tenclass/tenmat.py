@@ -1,7 +1,6 @@
-import pyten.tenclass
+from . import tensor, sptenmat
 import numpy as np
 from pyten.tools import tools
-import pyten.tenclass
 
 
 class Tenmat(object):
@@ -24,7 +23,7 @@ class Tenmat(object):
         if x is None:
             raise ValueError('Tenmat: first argument cannot be empty.')
 
-        if x.__class__ == pyten.tenclass.Tensor:
+        if x.__class__ == tensor.Tensor:
             # convert a Tensor to a matrix
             if rdim is None:
                 raise ValueError('Tenmat: second argument cannot be empty.')

@@ -19,4 +19,4 @@ def tendiag(v, sz):
     for i in range(n):
         x[subs[i][0], subs[i][1], subs[i][2]] = v[i]
 
-    return pyten.tenclass.Tensor(x)
+    return pyten.tenclass.tensor.Tensor(x)

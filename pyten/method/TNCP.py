@@ -1,6 +1,7 @@
 import numpy as np
-import pyten.tenclass
-import pyten.tools
+import pyten.tenclass as tenclass
+import pyten.tools as tools
+import pyten.tenclass.tenmat as tenmat
 
 
 class TNCP(object):
@@ -23,19 +24,19 @@ class TNCP(object):
                  printitn=500):
         if not obser:
             raise ValueError("TNCP: observed Tensor cannot be empty!")
-        elif type(obser) != pyten.tenclass.Tensor and type(obser) != np.ndarray:
-            raise ValueError("TNCP: cannot recognize the format of observed Tensor!")
+        elif type(obser) != tenclass.tensor.Tensor and type(obser) != np.ndarray:
+            raise ValueError(f"TNCP: cannot recognize the format of observed Tensor! {type(obser)}")
         elif type(obser) == np.ndarray:
-            self.T = pyten.tenclass.Tensor(obser)
+            self.T = tenclass.Tensor(obser)
         else:
             self.T = obser
 
         if omega is None:
             self.omega = self.T.data * 0 + 1
-        if type(omega) != pyten.tenclass.Tensor and type(omega) != np.ndarray:
+        if type(omega) != tenclass.tensor.Tensor and type(omega) != np.ndarray:
             raise ValueError("TNCP: cannot recognize the format of indicator Tensor!")
         elif type(omega) == np.ndarray:
-            self.Omega = pyten.tenclass.Tensor(omega)
+            self.Omega = tenclass.tensor.Tensor(omega)
         else:
             self.Omega = omega
 
@@ -79,9 +80,9 @@ class TNCP(object):
         self.U = [np.random.rand(self.shape[i], self.rank) for i in range(self.ndims)]
         self.Y = [np.zeros((self.shape[i], self.rank)) for i in range(self.ndims)]
         self.Z = [np.zeros((self.shape[i], self.rank)) for i in range(self.ndims)]
-        self.II = pyten.tools.tendiag(np.ones(self.rank), [self.rank for i in range(self.ndims)])
+        self.II = tools.tendiag(np.ones(self.rank), [self.rank for i in range(self.ndims)])
         self.X = self.T.data + (1 - self.Omega.data) * (self.T.norm() / self.T.size())
-        self.X = pyten.tenclass.Tensor(self.X)
+        self.X = tenclass.tensor.Tensor(self.X)
         self.X_pre = self.X.copy()
 
     def run(self):
@@ -116,13 +117,13 @@ class TNCP(object):
                     if j == i:
                         continue
                     midT = midT.ttm(self.U[j], j + 1)
-                unfoldD_temp = pyten.tenclass.Tenmat(midT, i + 1)
+                unfoldD_temp = tenmat.Tenmat(midT, i + 1)
 
                 temp_Z = self.eta * self.Z[i] + self.Y[i]
                 temp_B = np.dot(unfoldD_temp.data, unfoldD_temp.data.T)
                 temp_B += self.eta * np.identity(self.rank)
                 temp_B += 0.00001 * np.identity(self.rank)
-                temp_C = pyten.tenclass.Tenmat(self.X, i + 1)
+                temp_C = tenmat.Tenmat(self.X, i + 1)
                 temp_D = np.dot(temp_C.data, unfoldD_temp.data.T)
                 self.U[i] = np.dot((temp_D + temp_Z), np.linalg.inv(temp_B))
 

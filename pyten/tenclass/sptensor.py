@@ -1,6 +1,6 @@
 import sys
-sys.path.append('/home/xuan/MultiAgentEvaluation/tensorCompletion/pyten/pyten/tenclass')
-import tensor, sptenmat
+# sys.path.append('/home/xuan/MultiAgentEvaluation/tensorCompletion/pyten/pyten/tenclass')
+from . import tensor, sptenmat
 import numpy as np
 import scipy as sp
 from pyten.tools import tools

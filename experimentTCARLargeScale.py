@@ -22,11 +22,16 @@ from tensorly.decomposition import tucker,CP, parafac
 import csv
 from numpy.linalg import matrix_rank
 
+NUM_STRATEGIES = 1000
+NUM_PLAYERS = 4
+HUMAN_EST_PAYOFF_TENSOR_CP_RANK = 200
+
+
 def get_game_fictitious_play_payoff_data(game, num_players, game_settings):
   """Returns the kuhn poker data for the number of players specified."""
   game = pyspiel.load_game(game, game_settings)
   xfp_solver = fictitious_play.XFPSolver(game, save_oracles=True)
-  for _ in range(999):
+  for _ in range(NUM_STRATEGIES - 1):
     xfp_solver.iteration()
 
   meta_games = xfp_solver.get_empirical_metagame(100, seed=27)
@@ -39,8 +44,7 @@ def get_game_fictitious_play_payoff_data(game, num_players, game_settings):
 
 def main(unused_arg):
   # Construct meta-game payoff tables
-  num_players = 4
-  payoff_tables = get_game_fictitious_play_payoff_data('kuhn_poker', num_players, {'players': num_players})
+  payoff_tables = get_game_fictitious_play_payoff_data('kuhn_poker', NUM_PLAYERS, {'players': NUM_PLAYERS})
 
   with open('payoff_open_spiel_kuhn_poker_seed27_data.npy', 'wb') as f:
     np.save(f, np.array(payoff_tables))
@@ -57,26 +61,25 @@ def main(unused_arg):
   # Report & plot results
   utils.print_rankings_table(payoff_tables, pi, strat_labels_original, num_top_strats_to_print=10)
 
-  for data_keep_rate in np.arange(0.3,0.99,0.01):
+  for data_keep_rate in np.arange(0.3,0.99,0.1):
     ####### setup tensor completion ##########
     payoff_shape = payoff_tables[0].shape
-    omegas = []
+    rng = np.random.default_rng(int(data_keep_rate*100))
+    omega = (rng.random(payoff_shape) <= data_keep_rate) * 1
+    print("np.count_nonzero(omega==0): ", np.count_nonzero(omega==0))
+    omegas = [omega] * NUM_PLAYERS
     payoff_missing_tensors = []
-    for i in range(len(payoff_tables)):
-      rng = np.random.default_rng(i*7)
-      omega = (rng.random(payoff_shape) <= data_keep_rate) * 1
-      print("np.count_nonzero(omega==0): ", np.count_nonzero(omega==0))
+    for i in range(len(payoff_tables)):      
       X1 = tensor.Tensor(payoff_tables[i].copy())
       X1.data[omega == 0] = 0
       print("np.count_nonzero(X1.data==0): ", np.count_nonzero(X1.data==0))
       payoff_missing_tensors.append(X1)
-      omegas.append(omega)
+      # omegas.append(omega)
 
     ###### tensor completion #########
     completed_payoff_tensors = []
-    r = 200 # human estimation
     for i in range(len(payoff_missing_tensors)):
-      tncp1 = TNCP(payoff_missing_tensors[i], omegas[i], rank=r, tol=1e-15, max_iter=5000, printitn=0) # 
+      tncp1 = TNCP(payoff_missing_tensors[i], omegas[i], rank=HUMAN_EST_PAYOFF_TENSOR_CP_RANK, tol=1e-15, max_iter=5000, printitn=0) # 
       tncp1.run()
       recoerved_result = tncp1.X
       completed_payoff_tensors.append(recoerved_result)
@@ -95,7 +98,7 @@ def main(unused_arg):
       # print(pi_est)
       utils.print_rankings_table(completed_payoff_tables, pi_est, strat_labels, num_top_strats_to_print=10)
     except ValueError as e:
-      print(e)
+      print("ValueError!!!", e)
       continue
 
     ##### alpharank with original payoff #################

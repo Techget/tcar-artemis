@@ -10,14 +10,14 @@ def tenerror(fitx, realx, omega):
     :param omega: index tensor of observed entries
     """
 
-    if type(omega) != np.ndarray and type(omega) != pyten.tenclass.Tensor:
+    if type(omega) != np.ndarray and type(omega) != pyten.tenclass.tensor.Tensor:
         raise ValueError("AirCP: cannot recognize the format of observed Tensor!")
-    elif type(omega) == pyten.tenclass.Tensor:
+    elif type(omega) == pyten.tenclass.tensor.Tensor:
         omega = omega.tondarray
     if type(realx) == np.ndarray:
-        realx = pyten.tenclass.Tensor(realx)
+        realx = pyten.tenclass.tensor.Tensor(realx)
     if type(fitx) == np.ndarray:
-        realx = pyten.tenclass.Tensor(realx)
+        realx = pyten.tenclass.tensor.Tensor(realx)
     norm1 = np.linalg.norm(realx.data)
     norm2 = np.linalg.norm(realx.data * (1 - omega))
     err1 = np.linalg.norm(fitx.data - realx.data)  # Absolute Error
