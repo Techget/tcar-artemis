@@ -61,7 +61,7 @@ def main(unused_arg):
   # Report & plot results
   utils.print_rankings_table(payoff_tables, pi, strat_labels_original, num_top_strats_to_print=10)
 
-  for data_keep_rate in np.arange(0.3,0.99,0.1):
+  for data_keep_rate in np.arange(0.3,0.99,0.01):
     ####### setup tensor completion ##########
     payoff_shape = payoff_tables[0].shape
     rng = np.random.default_rng(int(data_keep_rate*100))
